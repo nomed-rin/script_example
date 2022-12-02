@@ -1,0 +1,94 @@
+setfflag("HumanoidParallelRemoveNoPhysics", "False")
+setfflag("HumanoidParallelRemoveNoPhysicsNoSimulate2", "False")
+game:GetService"RunService".Stepped:Connect(function() 
+    game.Players.LocalPlayer.Character.Humanoid:ChangeState(11) 
+end)
+-------------------ดึง Tag เอา CFrame NPCQuest
+local QuestCF = {} 
+local Signal = game:GetService("Workspace").Monster
+for _, p in pairs(game:GetService("CollectionService"):GetTagged("Detail")) do
+	if p.Name:find("Quest") then
+		QuestCF[p.Name] = p.HumanoidRootPart.CFrame
+	end
+end
+------------------- ดึงเควสที่เราสามารถทำได้ในเกม 
+local LocalPlayer = game.Players.LocalPlayer
+local function Quest()
+	local MonQuest = {}
+	local Lvl = LocalPlayer.PlayerStats.lvl.Value
+	local p = require(game:GetService("ReplicatedStorage").Modules.QuestManager)
+	for i, v in pairs(p) do
+		local QuestName = string.format("QuestLvl%s", v.Level)
+		if i:find("Kill")  and (Lvl <= 10 or  Lvl <= v.Level)  and QuestCF[QuestName] then
+			table.insert(MonQuest, {
+				Name = v.Mob,
+				lvl = v.Level
+			})
+		end
+	end
+	table.sort(MonQuest, function(a, b)
+		return a.lvl < b.lvl
+	end )
+	return MonQuest
+end
+------------------- ที่เก็บเควส
+local QuestTable = Quest()
+-------------------ทำให้เควสที่เราทำได้ อยุ่ใน indx [1] เสมอ 
+local function QuestRemove(arg)
+	if LocalPlayer.PlayerStats.lvl.Value > QuestTable[1].lvl and LocalPlayer.PlayerStats.lvl.Value > QuestTable[2].lvl and QuestTable[2]  and QuestCF[arg] then
+		table.remove(QuestTable, 1)
+		wait(2)
+		return false
+		else return true
+	end
+end
+------------------- ย้าย Boss folder 
+local function MoveParent()
+	for i, v in pairs(Signal.Boss:GetChildren()) do
+		v.Parent = Signal.Mon
+	end
+end
+------------------- -------------------รับเควส เช็คเควส 
+local function GetQuest()
+    local QuestName = string.format("QuestLvl%s", QuestTable[1].lvl)
+	if LocalPlayer.CurrentQuest.Value == ""  and QuestRemove(QuestName) then
+		for i, v in pairs(QuestCF) do
+			if i == QuestName then
+			    print(QuestTable[1].lvl)
+				LocalPlayer.Character.HumanoidRootPart.CFrame = v
+				repeat
+					wait()
+					game:GetService("ReplicatedStorage").Remotes.Functions.CheckQuest:InvokeServer(game:GetService("Workspace").AllNPC[QuestName]);
+				until LocalPlayer.PlayerGui:FindFirstChild(QuestName)
+				QuestGui =  LocalPlayer.PlayerGui[QuestName].Dialogue.Accept
+				repeat
+					wait()
+					game:GetService("VirtualInputManager"):SendMouseButtonEvent(QuestGui.AbsolutePosition.X + 50, QuestGui.AbsolutePosition.Y + 50, 0, not game.UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1), game, 0)
+				until LocalPlayer.CurrentQuest.Value ~= ""
+				return false
+			end
+		end
+	else
+		return true
+	end
+end
+local function GetCFraMob()
+	for i, v in pairs(Signal.Mon:GetChildren()) do
+		if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health >= 1 and  v.Name == QuestTable[1].Name then 
+			local cframe = v.HumanoidRootPart.CFrame
+			cframe *= CFrame.new(0,-5,0)
+			return cframe
+		end
+	end
+end
+local function Click()
+	game:GetService("VirtualUser"):CaptureController()
+	game:GetService("VirtualUser"):Button1Down(Vector2.new(-999, 0), workspace.CurrentCamera.CFrame)
+	game:GetService("VirtualUser"):Button1Up(Vector2.new(-999, 0), workspace.CurrentCamera.CFrame)
+end
+local function ShittyFarm()
+	if GetQuest() and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character:FindFirstChild("Humanoid") then
+	    Click()
+		LocalPlayer.Character.HumanoidRootPart.CFrame = GetCFraMob() 
+	end
+end
