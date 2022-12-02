@@ -1,3 +1,4 @@
+--สคริปนี้ จัดทำเพื่อการศึกษาเท่านั้นไม่ได้มีเจตนา ร้ายหรือ อะไรทั้งสิ้นจัดทำเพื่อ การศึกษา และ เป็นต้นแบบ ในการศึกษา
 setfflag("HumanoidParallelRemoveNoPhysics", "False")
 setfflag("HumanoidParallelRemoveNoPhysicsNoSimulate2", "False")
 game:GetService"RunService".Stepped:Connect(function() 
