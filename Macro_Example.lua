@@ -80,10 +80,10 @@ local function CheckUnit(UnitName, UnitPosition)
 	end
 end
 local function ToggleRecord(filesname)
-	MultiboxFramework["Network"].Fire = function(Method, Instance, Positions, Order)
-		if Lobby then
+       		if Lobby then
 			return
 		end
+	MultiboxFramework["Network"].Fire = function(Method, Instance, Positions, Order)
 		if Method == "PlaceTroop" or  Method == "UpgradeTroop" or  Method == "SellTroop" or  Method == "ChangeTargetting" then
 			local price = GetPrice(Method, (Instance))
 			print(price)
