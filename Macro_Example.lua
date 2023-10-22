@@ -406,7 +406,7 @@ local function loadUI()
 			ToggleRecord(Options.Record.Value:split([[\]])[2])
 		elseif Options.Mode.Value == "AutoPlay" then 
 			AutoPlays()
-			print("AutoPlay is Testing Beta")
+			print("AutoPlay is WIP")
 		end
 	end)
 	Toggles.difficult:OnChanged(function()
