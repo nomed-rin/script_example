@@ -396,7 +396,9 @@ local function Verify_Unit(name, Position, UnitId)
 	end
 	for i, v in pairs(game.Workspace.Towers:GetChildren()) do
 		local UID = v.HumanoidRootPart:GetDebugId() 
-		Unit_Id = Idenity[UnitId]
+		if Idenity[UnitId] then
+		   Unit_Id = Idenity[UnitId]
+		end
 		if v.HumanoidRootPart.Position == Position or (v.HumanoidRootPart.Position - Position).magnitude < 2 or UID == UnitId then
 			print("Ye")
 			return {
