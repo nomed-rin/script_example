@@ -3,14 +3,15 @@
 -- Last Update  11/10/23
 -- using DebugId to Verify unit is good than using position and compare Magnitude 
 -- and Find a true positon if map position has change 
+
 repeat
 	wait()
 until game:IsLoaded()
 -- Royx
 DebugMode = true
---wating until gameload 
+wait(6)
 require(game:GetService("ReplicatedStorage").Client.Initializers.Audio)
------
+
 local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
@@ -371,22 +372,6 @@ local function GET_UID(name, Position)
 		end
 	end
 end
----------------------------------------- Verify
-local function Verify_Unit(name, Position, UnitId)
-	if type(Position) == "string" then
-		Position = stringtopos(Position)
-	end
-	for i, v in pairs(game.Workspace.Towers:GetChildren()) do
-		local UID = v.HumanoidRootPart:GetDebugId()
-		if v.HumanoidRootPart.Position == Position or (v.HumanoidRootPart.Position - Position).magnitude < 2 or UID == UnitId then
-			print("Ye")
-			return {
-				Id = v.HumanoidRootPart:GetDebugId(),
-				Instance = v
-			}
-		end
-	end
-end
 ---------------------------------------- Misc 
 getgenv().LastRemote = nil
 getgenv().LastRemoteAction = nil
@@ -403,6 +388,23 @@ getgenv().UnitIds = ""
 local PlyHasJoin = false
 if not game.Workspace:FindFirstChild("Elevators") then
 	getgenv().Moduel = require(game:GetService("ReplicatedStorage").Client.Modules.Game.Interface.Elements.Upgrade.upgradeHandler)
+end
+---------------------------------------- Verify
+local function Verify_Unit(name, Position, UnitId)
+	if type(Position) == "string" then
+		Position = stringtopos(Position)
+	end
+	for i, v in pairs(game.Workspace.Towers:GetChildren()) do
+		local UID = v.HumanoidRootPart:GetDebugId() 
+		Unit_Id = Idenity[UnitId]
+		if v.HumanoidRootPart.Position == Position or (v.HumanoidRootPart.Position - Position).magnitude < 2 or UID == UnitId then
+			print("Ye")
+			return {
+				Id = v.HumanoidRootPart:GetDebugId(),
+				Instance = v
+			}
+		end
+	end
 end
  ----------------------------------------  loadunit
 function loadunit(file)
@@ -565,6 +567,7 @@ local function Plays()
 					local Unit
 					local Ply_Money = stringtoNum(game.Players.LocalPlayer.PlayerGui.GameGui.Hotbar.Stats.Cash.Amount.Text)
 					if Ply_Money >= stringtoNum(ve['Price']) then
+						-- 
 						Unit = Verify_Unit(ve['Unit'], ve['Stamp'] or ve['Position'], ve['Unit_Id'])
 						UnitControl(Unit["Instance"], ve["Unit_Id"], ve["Action"])
 					end
